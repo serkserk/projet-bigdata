@@ -45,11 +45,17 @@ loadcapteurs <- function(){
   
   geo <- data.frame(idscapteurs$fields$id_arc_tra,idscapteurs$lng,idscapteurs$lat)
   geo <- na.omit(geo)
-  geo$idscapteurs.fields.id_arc_tra <- NULL
-  rownames(geo) <- geo$idscapteurs.fields.id_arc_tra
-  colnames(geo) <- c("lng","lat")
+  geo$ids <- geo$idscapteurs.fields.id_arc_tra
+  colnames(geo) <- c("id","lng","lat")
   
   return(geo)
+  
+}
+
+loadStationInfo <- function(station_number){
+  
+  q <- paste0('{"id" : ' , station_number , '}')
+  return(tra$find(q,sort = '{"date" : 1 }'))
   
 }
 
