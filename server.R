@@ -46,7 +46,8 @@ loadcapteurs <- function(){
   geo <- data.frame(idscapteurs$fields$id_arc_tra,idscapteurs$lng,idscapteurs$lat)
   geo <- na.omit(geo)
   geo$ids <- geo$idscapteurs.fields.id_arc_tra
-  colnames(geo) <- c("id","lng","lat")
+  geo$idscapteurs.fields.id_arc_tra <- NULL
+  colnames(geo) <- c("lng","lat","id")
   
   return(geo)
   
@@ -74,8 +75,32 @@ shinyServer( function(input, output,session) {
     
     loadcapteurs()
     geo <- loadcapteurs()
-    paris %>% addCircleMarkers(data = geo, radius = 1)
+    popup <- paste0("<strong> Station Id :  </strong>",geo$id)
+    paris %>% addCircleMarkers(data = geo,
+                               lat = ~lat, 
+                               lng = ~lng,
+                               radius = 1,
+                               opacity = 1,
+                               layerId = ~id,
+                               popup = popup,
+                               weight = 5)
     
   })
+  
+  observeEvent(input$Carte_capteurs_marker_click,{
+    
+    click <- input$Carte_capteurs_marker_click
+    
+    # Load the sation info of the clicked station 
+    info <- loadStationInfo(click$id)
+    
+    output$series <- renderPlot({
+      plot.ts(info$debit)
+    })
+    
+  })
+  
+  
+  
   
 })

@@ -15,14 +15,14 @@ ui <- fluidPage(
                 
                 sidebarPanel(
                   
-                  plotOutput(outputId = "histogram",width = "100%",height = "280px")
+                  plotOutput(outputId = "series",width = "100%",height = "280px")
                   
                 ),
                 
                 mainPanel(
                   
                   titlePanel("Carte des capteurs"),
-                  leafletOutput(outputId = "Carte_capteurs")
+                  leafletOutput("Carte_capteurs")
                   
               )
       )
