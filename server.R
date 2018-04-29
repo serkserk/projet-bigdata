@@ -155,23 +155,26 @@ shinyServer( function(input, output,session) {
     # TABLE DES DONNEES TRIER
     merged <- merge(geo,TRAFFIC_ANNEE)
     ord <- merged[order(merged$debit),]
+    ord <- ord[which(ord$debit > 0),]
     
-    if(input$top == "Station avec le moins de traffic" ){
+    proxy %>% clearMarkers()
+    
+    if(input$top == "Station avec le plus de traffic" ){
     
     top <-ord[(nrow(ord) - 49):(nrow(ord)),]
+    print(top)
     
     }
     
     if(input$top == "Station avec le moins de traffic" ){
       
       # On enleve les stations qui ne fonctionne pas
-      top <- ord[which(ord$debit > 0),]
-      
-      top <- top[1:50,]
+      top <- ord[1:50,]
+      print(top)
       
     }
     
-    if(input$top == "toute les stations"){
+    else{
       top <- ord
     }
     
@@ -188,14 +191,13 @@ shinyServer( function(input, output,session) {
                                                 weight = 5)
     
     
-    output$tabTop <- renderTable({
+    output$tabTop <- renderDataTable({
       top
     })
     
     
   })
-
-    
-  })
+  
+})
   
   

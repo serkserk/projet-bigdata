@@ -26,7 +26,7 @@ ui <- fluidPage( theme = shinytheme("superhero"),
                   
                   titlePanel("Carte des capteurs"),
                   leafletOutput("Carte_capteurs"),
-                  tableOutput(outputId = "tabTop")
+                  dataTableOutput(outputId = "tabTop")
                   
               )
       )
