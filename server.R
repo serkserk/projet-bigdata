@@ -5,6 +5,7 @@
 library(mongolite)
 library(leaflet)
 library(dplyr)
+library(ggplot2)
 
 ################### CONNECTION TO MONGO #######################
 
@@ -56,16 +57,44 @@ loadcapteurs <- function(){
 loadStationInfo <- function(station_number){
   
   q <- paste0('{"id" : ' , station_number , '}')
-  return(tra$find(q,sort = '{"date" : 1 }'))
+  return(tra$find(q))
   
 }
+
+# Chargement du nombre de voiture par ans par voiture :
+loadTrafficYear <- function(){
+  
+  # Compte le traffic par année par station 
+  
+  agg = tra$aggregate(
+    '[
+  { "$group": { 
+    "_id": { 
+      "id" : "$id",
+      "annee": { "$year": "$date" }
+    }, 
+    "traffic": { "$sum": "$debit" }
+  }}
+
+  ]')
+  
+  return(agg)
+  
+}
+
+############ VARIABLES GLOBALES  ################
+
+# A GARDER MAIS PREND BEAUCOUP DE TEMPS A CHARGER
+#TRAFFIC_ANNEE <- loadTrafficYear()
 
 ################### SERVER ##################
 
 shinyServer( function(input, output,session) { 
   
   # Carte de Paris
-  paris = leaflet() %>% addTiles %>% setView(lng = 2.34, lat = 48.855, zoom = 12) %>% addTiles()
+  paris = leaflet() %>% addTiles %>% setView(lng = 2.34, lat = 48.855, zoom = 12) %>% 
+    addTiles() %>%
+    addProviderTiles(providers$CartoDB.DarkMatter)
   
   # Liste des ids des stations : 
   listeIds <- tra$distinct("id")
@@ -100,12 +129,21 @@ shinyServer( function(input, output,session) {
       
       output$series <- renderPlot({
 
-        s <- ts(info$debit)
-        plot(s,ylim = c(0,3000))
+        print(info)
+        info %>% 
+          mutate(annee = format(date, "%Y"), 
+                 jour = format(date, "%j")) %>%
+          ggplot(aes(jour, tauxNum, col = annee)) +
+          geom_line() +
+          theme_classic()
         
     })
       
     }
+    
+  })
+  
+
     
   })
   

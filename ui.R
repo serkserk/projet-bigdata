@@ -16,6 +16,8 @@ ui <- fluidPage( theme = shinytheme("superhero"),
                 
                 sidebarPanel(
                   
+                  selectInput(inputId = "type", label = strong("Station : "),
+                              choices = c("Station avec le plus de traffic", "Station avec le moins de traffic")),
                   plotOutput(outputId = "series",width = "100%",height = "280px")
                   
                 ),
