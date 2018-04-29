@@ -70,26 +70,36 @@ loadTrafficYear <- function(){
     '[
   { "$group": { 
     "_id": { 
-      "id" : "$id",
-      "annee": { "$year": "$date" }
+      "id" : "$id"
     }, 
     "traffic": { "$sum": "$debit" }
   }}
 
   ]')
   
-  return(agg)
+  # Format the data frame
+  
+  df <- as.data.frame(agg)
+  df <- data.frame(df$`_id`$id,df$traffic)
+  colnames(df) <-  c("id","debit")
+  
+  print("données chargées")
+  return(df)
   
 }
 
 ############ VARIABLES GLOBALES  ################
 
 # A GARDER MAIS PREND BEAUCOUP DE TEMPS A CHARGER
-#TRAFFIC_ANNEE <- loadTrafficYear()
+TRAFFIC_ANNEE <- loadTrafficYear()
 
 ################### SERVER ##################
 
 shinyServer( function(input, output,session) { 
+  
+  
+  
+  ######### VARIABLES SERVER  #######
   
   # Carte de Paris
   paris = leaflet() %>% addTiles %>% setView(lng = 2.34, lat = 48.855, zoom = 12) %>% 
@@ -101,24 +111,17 @@ shinyServer( function(input, output,session) {
   
   print("lancement de l'application")
   
-  # carte des capteurs
+  # Capteurs 
+  geo <- loadcapteurs()
   
+  # Carte de paris
   output$Carte_capteurs <- renderLeaflet({
-    
-    geo <- loadcapteurs()
-
-    popup <- paste0("<strong> Station Id :  </strong>",geo$id)
-    paris %>% addCircleMarkers(data = geo,
-                               lat = ~lat, 
-                               lng = ~lng,
-                               radius = 1,
-                               opacity = 1,
-                               layerId = ~id,
-                               popup = popup,
-                               weight = 5)
-    
+    paris
   })
   
+  ############ INPUT / OUTPUT ############
+  
+  # Event when a stationis clicked
   observeEvent(input$Carte_capteurs_marker_click,{
     
     click <- input$Carte_capteurs_marker_click
@@ -143,11 +146,56 @@ shinyServer( function(input, output,session) {
     
   })
   
+  
+  observeEvent(input$top,{
+    
+    # Connection a la carte
+    proxy <- leafletProxy("Carte_capteurs")
+    
+    # TABLE DES DONNEES TRIER
+    merged <- merge(geo,TRAFFIC_ANNEE)
+    ord <- merged[order(merged$debit),]
+    
+    if(input$top == "Station avec le moins de traffic" ){
+    
+    top <-ord[(nrow(ord) - 49):(nrow(ord)),]
+    
+    }
+    
+    if(input$top == "Station avec le moins de traffic" ){
+      
+      # On enleve les stations qui ne fonctionne pas
+      top <- ord[which(ord$debit > 0),]
+      
+      top <- top[1:50,]
+      
+    }
+    
+    if(input$top == "toute les stations"){
+      top <- ord
+    }
+    
+    print(top)
+    
+    popup <- paste0("<strong> Station Id :  </strong>",top$id)
+    proxy %>% addCircleMarkers(data = top,
+                                                lat = ~lat, 
+                                                lng = ~lng,
+                                                radius = 1,
+                                                opacity = 1,
+                                                layerId = ~id,
+                                                popup = popup,
+                                                weight = 5)
+    
+    
+    output$tabTop <- renderTable({
+      top
+    })
+    
+    
+  })
 
     
   })
   
   
-  
-  
-})

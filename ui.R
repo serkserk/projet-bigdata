@@ -16,8 +16,8 @@ ui <- fluidPage( theme = shinytheme("superhero"),
                 
                 sidebarPanel(
                   
-                  selectInput(inputId = "type", label = strong("Station : "),
-                              choices = c("Station avec le plus de traffic", "Station avec le moins de traffic")),
+                  selectInput(inputId = "top", label = strong("Station : "),
+                              choices = c("toute les stations" , "Station avec le plus de traffic", "Station avec le moins de traffic")),
                   plotOutput(outputId = "series",width = "100%",height = "280px")
                   
                 ),
@@ -25,7 +25,8 @@ ui <- fluidPage( theme = shinytheme("superhero"),
                 mainPanel(
                   
                   titlePanel("Carte des capteurs"),
-                  leafletOutput("Carte_capteurs")
+                  leafletOutput("Carte_capteurs"),
+                  tableOutput(outputId = "tabTop")
                   
               )
       )
