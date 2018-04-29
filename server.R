@@ -67,14 +67,17 @@ shinyServer( function(input, output,session) {
   # Carte de Paris
   paris = leaflet() %>% addTiles %>% setView(lng = 2.34, lat = 48.855, zoom = 12) %>% addTiles()
   
+  # Liste des ids des stations : 
+  listeIds <- tra$distinct("id")
+  
   print("lancement de l'application")
   
   # carte des capteurs
   
   output$Carte_capteurs <- renderLeaflet({
     
-    loadcapteurs()
     geo <- loadcapteurs()
+
     popup <- paste0("<strong> Station Id :  </strong>",geo$id)
     paris %>% addCircleMarkers(data = geo,
                                lat = ~lat, 
@@ -93,10 +96,16 @@ shinyServer( function(input, output,session) {
     
     # Load the sation info of the clicked station 
     info <- loadStationInfo(click$id)
-    
-    output$series <- renderPlot({
-      plot.ts(info$debit)
+    if (info$id[[1]] %in% listeIds){
+      
+      output$series <- renderPlot({
+
+        s <- ts(info$debit)
+        plot(s,ylim = c(0,3000))
+        
     })
+      
+    }
     
   })
   

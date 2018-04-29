@@ -4,10 +4,11 @@
 
 library(shiny)
 library(leaflet)
+library(shinythemes)
 
 
 
-ui <- fluidPage(
+ui <- fluidPage( theme = shinytheme("superhero"),
   
   tabsetPanel(type = "tabs",
               
