@@ -12,12 +12,14 @@ ui <- fluidPage( theme = shinytheme("superhero"),
   
   tabsetPanel(type = "tabs",
               
+              tabPanel("Carte des capteurs",
+              
               sidebarLayout(
                 
                 sidebarPanel(
                   
-                  selectInput(inputId = "top", label = strong("Station : "),
-                              choices = c("toute les stations" , "Station avec le plus de traffic", "Station avec le moins de traffic")),
+                  selectInput(inputId = "top", label = strong("Filtre : "),
+                              choices = c("toute les stations" , "Station avec le plus de traffic", "Station avec le moins de traffic","heatmap traffic")),
                   plotOutput(outputId = "series",width = "100%",height = "280px"),
                   plotOutput(outputId = "mois",width = "100%",height = "280px"),
                   plotOutput(outputId = "jour",width = "100%",height = "280px")
@@ -31,8 +33,8 @@ ui <- fluidPage( theme = shinytheme("superhero"),
                   dataTableOutput(outputId = "tabTop")
                   
               )
-      )
-      
+        )
+      ),
+      tabPanel("onglet2")
   )
-  
 )

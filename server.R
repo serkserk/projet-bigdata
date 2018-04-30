@@ -6,6 +6,7 @@ library(mongolite)
 library(leaflet)
 library(dplyr)
 library(ggplot2)
+library(leaflet.extras)
 
 ################### CONNECTION TO MONGO #######################
 
@@ -187,8 +188,8 @@ shinyServer( function(input, output,session) {
     
     # TABLE DES DONNEES TRIER
     merged <- merge(geo,TRAFFIC_ANNEE)
-    ord <- merged[order(merged$debit),]
-    ord <- ord[which(ord$debit > 0),]
+    ord <- merged[order(merged$taux),]
+    ord <- ord[which(ord$taux > 0),]
     
     proxy %>% clearMarkers()
     
@@ -204,6 +205,7 @@ shinyServer( function(input, output,session) {
       top <- ord[1:50,]
       
     }
+    
     
     else{
       top <- ord
@@ -221,6 +223,11 @@ shinyServer( function(input, output,session) {
                                                 weight = 5,
                                                 color = "blue")
     
+    
+    if(input$top == "heatmap traffic"){
+      proxy %>% clearMarkers()
+      proxy %>% addHeatmap(data = top,intensity = ~taux/100)
+    }
     
     output$tabTop <- renderDataTable({
       
