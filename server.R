@@ -72,7 +72,9 @@ loadTrafficYear <- function(){
     "_id": { 
       "id" : "$id"
     }, 
-    "traffic": { "$sum": "$debit" }
+    "debit": { "$sum": "$debit" },
+    "taux" : { "$avg": "$taux" }
+
   }}
 
   ]')
@@ -80,8 +82,8 @@ loadTrafficYear <- function(){
   # Format the data frame
   
   df <- as.data.frame(agg)
-  df <- data.frame(df$`_id`$id,df$traffic)
-  colnames(df) <-  c("id","debit")
+  df <- data.frame(df$`_id`$id,df$debit,df$taux)
+  colnames(df) <-  c("id","debit","taux")
   
   print("données chargées")
   return(df)
@@ -95,7 +97,7 @@ loadTrafficYear <- function(){
 
 # POUR LES TESTS : 
 
-TRAFFIC_ANNEE <-read.csv("debit.csv",row.names = 1)
+TRAFFIC_ANNEE <- read.csv("debittaux.csv",row.names = 1)
 
 ################### SERVER ##################
 
@@ -221,7 +223,9 @@ shinyServer( function(input, output,session) {
     
     
     output$tabTop <- renderDataTable({
+      
       top
+      
     })
     
     
