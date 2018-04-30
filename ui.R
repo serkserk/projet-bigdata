@@ -18,7 +18,9 @@ ui <- fluidPage( theme = shinytheme("superhero"),
                   
                   selectInput(inputId = "top", label = strong("Station : "),
                               choices = c("toute les stations" , "Station avec le plus de traffic", "Station avec le moins de traffic")),
-                  plotOutput(outputId = "series",width = "100%",height = "280px")
+                  plotOutput(outputId = "series",width = "100%",height = "280px"),
+                  plotOutput(outputId = "mois",width = "100%",height = "280px"),
+                  plotOutput(outputId = "jour",width = "100%",height = "280px")
                   
                 ),
                 

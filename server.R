@@ -91,7 +91,11 @@ loadTrafficYear <- function(){
 ############ VARIABLES GLOBALES  ################
 
 # A GARDER MAIS PREND BEAUCOUP DE TEMPS A CHARGER
-TRAFFIC_ANNEE <- loadTrafficYear()
+#TRAFFIC_ANNEE <- loadTrafficYear()
+
+# POUR LES TESTS : 
+
+TRAFFIC_ANNEE <-read.csv("debit.csv",row.names = 1)
 
 ################### SERVER ##################
 
@@ -128,11 +132,13 @@ shinyServer( function(input, output,session) {
     
     # Load the sation info of the clicked station 
     info <- loadStationInfo(click$id)
+    
+    # Check si des données sont disponibles : 
+    
     if (info$id[[1]] %in% listeIds){
       
       output$series <- renderPlot({
 
-        print(info)
         info %>% 
           mutate(annee = format(date, "%Y"), 
                  jour = format(date, "%j")) %>%
@@ -141,6 +147,31 @@ shinyServer( function(input, output,session) {
           theme_classic()
         
     })
+      
+      output$mois <- renderPlot({
+        
+        
+        info %>% mutate(heure = format(date, "%H"),
+               mois = format(date, "%m")) %>%
+          group_by(heure, mois) %>%
+          summarise(moy = mean(tauxNum, na.rm = TRUE)) %>%
+          ggplot(aes(heure, moy, col = mois, group = mois)) +
+          geom_line() +
+          theme_classic()
+        
+      })
+      
+      output$jour <- renderPlot({
+        
+        info %>% mutate(heure = format(date, "%H"),
+               jour = format(date, "%A")) %>%
+          group_by(heure, jour) %>%
+          summarise(moy = mean(tauxNum, na.rm = TRUE)) %>%
+          ggplot(aes(heure, moy, col = jour, group = jour)) +
+          geom_line() +
+          theme_classic()
+        
+      })
       
     }
     
@@ -161,16 +192,14 @@ shinyServer( function(input, output,session) {
     
     if(input$top == "Station avec le plus de traffic" ){
     
-    top <-ord[(nrow(ord) - 49):(nrow(ord)),]
-    print(top)
+      print("test")
+    top <- ord[(nrow(ord) - 49):(nrow(ord)),]
+    print(nrow(ord))
     
     }
     
-    if(input$top == "Station avec le moins de traffic" ){
-      
-      # On enleve les stations qui ne fonctionne pas
+    else if(input$top == "Station avec le moins de traffic" ){
       top <- ord[1:50,]
-      print(top)
       
     }
     
@@ -178,7 +207,6 @@ shinyServer( function(input, output,session) {
       top <- ord
     }
     
-    print(top)
     
     popup <- paste0("<strong> Station Id :  </strong>",top$id)
     proxy %>% addCircleMarkers(data = top,
@@ -188,7 +216,8 @@ shinyServer( function(input, output,session) {
                                                 opacity = 1,
                                                 layerId = ~id,
                                                 popup = popup,
-                                                weight = 5)
+                                                weight = 5,
+                                                color = "blue")
     
     
     output$tabTop <- renderDataTable({
