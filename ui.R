@@ -8,9 +8,9 @@ library(shinythemes)
 
 
 
-ui <- fluidPage( theme = shinytheme("superhero"),
+ui <- fluidPage( theme = shinytheme("flatly"),
   
-  tabsetPanel(type = "tabs",
+  navbarPage( "Menu",
               
               tabPanel("Carte des capteurs",
               
@@ -35,6 +35,16 @@ ui <- fluidPage( theme = shinytheme("superhero"),
               )
         )
       ),
-      tabPanel("onglet2")
+      tabPanel("Info sur le trafic",
+                 
+               shiny::splitLayout(
+                 
+                 plotOutput(outputId = "debitparmois",width = "100%"),
+                 plotOutput(outputId = "debitparans",width = "99%")
+                 
+
+               )
+               
+        )
   )
 )
