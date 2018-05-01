@@ -112,17 +112,40 @@ loadYearMonthDebit <- function(){
   
 }
 
+
+loadDebitDays <- function(){
+  
+  agg = tra$aggregate(
+    '[
+  { "$group": { 
+    "_id": { 
+      "jour": { "$dayOfWeek": "$date" }
+    }, 
+    "debit": { "$avg": "$debit" }
+  }}
+]')
+  
+  res <- na.omit(agg)
+  df <- data.frame(res$`_id`$jour,res$debit)
+  colnames(df) <- c("jour","debit")
+  return(df)
+  
+}
+
+
 ############ VARIABLES GLOBALES  ################
 
 # A GARDER MAIS PREND BEAUCOUP DE TEMPS A CHARGER
 
 #TRAFFIC_ANNEE <- loadTrafficYear()
 #DEBITMOY <- loadYearMonthDebit()
+#DEBITJOUR <- loadDebitDays()
 
 # PLUS RAPIDE AVEC LES CSV SAUVEGARDE : 
 
 TRAFFIC_ANNEE <- read.csv("debittaux.csv",row.names = 1)
 DEBITMOY <- read.csv("DEBITMOY.csv",row.names = 1)
+DEBITJOUR <- read.csv("debitjour.csv",row.names = 1)
 
 ################### SERVER ##################
 
@@ -201,6 +224,7 @@ shinyServer( function(input, output,session) {
           theme_classic()
         
       })
+      
       
     }
     
@@ -292,9 +316,25 @@ shinyServer( function(input, output,session) {
       group_by(mois) %>%
       summarise(taux = mean(taux)) %>%
       ggplot(aes(mois, taux,fill = annee)) +
-      ggtitle("Moyenne du débit par annee") +
-      geom_bar(stat = "identity") +
+      ggtitle("Moyenne du débit par annee") + 
+      xlab("annee") +
+      geom_bar(stat = "identity") + 
       scale_x_continuous(breaks = 1:12) +
+      theme_light()
+    
+  })
+  
+  output$debitjour <- renderPlot({
+    
+    jour = c("dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi")
+    
+    tibble(mois = DEBITJOUR$jour, taux = DEBITJOUR$debit) %>%
+      group_by(mois) %>%
+      summarise(taux = mean(taux)) %>%
+      ggplot(aes(mois, taux,fill = jour)) + xlab("jour de la semaine")+
+      ggtitle("Moyenne du débit par jours") +
+      geom_bar(stat = "identity") +
+      scale_x_continuous(breaks = 1:7) +
       theme_light()
     
   })

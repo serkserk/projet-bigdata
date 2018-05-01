@@ -43,7 +43,8 @@ ui <- fluidPage( theme = shinytheme("flatly"),
                  plotOutput(outputId = "debitparans",width = "99%")
                  
 
-               )
+               ),
+               plotOutput(outputId = "debitjour")
                
         )
   )
