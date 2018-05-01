@@ -91,14 +91,38 @@ loadTrafficYear <- function(){
   
 }
 
+# Chargement du débit par mois et par année
+loadYearMonthDebit <- function(){
+  
+  agg = tra$aggregate(
+    '[
+  { "$group": { 
+    "_id": { 
+      "annee": { "$year": "$date" },
+      "mois": { "$month": "$date" }
+    }, 
+    "debit": { "$avg": "$debit" }
+  }}
+]')
+  
+  res <- na.omit(agg)
+  df <- data.frame(res$`_id`$annee,res$`_id`$mois,res$debit)
+  colnames(df) <- c("annee","mois","debit")
+  return(df)
+  
+}
+
 ############ VARIABLES GLOBALES  ################
 
 # A GARDER MAIS PREND BEAUCOUP DE TEMPS A CHARGER
-#TRAFFIC_ANNEE <- loadTrafficYear()
 
-# POUR LES TESTS : 
+#TRAFFIC_ANNEE <- loadTrafficYear()
+#DEBITMOY <- loadYearMonthDebit()
+
+# PLUS RAPIDE AVEC LES CSV SAUVEGARDE : 
 
 TRAFFIC_ANNEE <- read.csv("debittaux.csv",row.names = 1)
+DEBITMOY <- read.csv("DEBITMOY.csv",row.names = 1)
 
 ################### SERVER ##################
 
@@ -111,7 +135,7 @@ shinyServer( function(input, output,session) {
   # Carte de Paris
   paris = leaflet() %>% addTiles %>% setView(lng = 2.34, lat = 48.855, zoom = 12) %>% 
     addTiles() %>%
-    addProviderTiles(providers$CartoDB.DarkMatter)
+    addProviderTiles(providers$OpenStreetMap.BlackAndWhite)
   
   # Liste des ids des stations : 
   listeIds <- tra$distinct("id")
@@ -127,6 +151,8 @@ shinyServer( function(input, output,session) {
   })
   
   ############ INPUT / OUTPUT ############
+  
+  ############ ONGLET 1 CARTE CAPTEURS ##########
   
   # Event when a stationis clicked
   observeEvent(input$Carte_capteurs_marker_click,{
@@ -186,6 +212,8 @@ shinyServer( function(input, output,session) {
     # Connection a la carte
     proxy <- leafletProxy("Carte_capteurs")
     
+    proxy %>% clearHeatmap()
+    
     # TABLE DES DONNEES TRIER
     merged <- merge(geo,TRAFFIC_ANNEE)
     ord <- merged[order(merged$taux),]
@@ -217,7 +245,7 @@ shinyServer( function(input, output,session) {
                                                 lat = ~lat, 
                                                 lng = ~lng,
                                                 radius = 1,
-                                                opacity = 1,
+                                                opacity = 0.5,
                                                 layerId = ~id,
                                                 popup = popup,
                                                 weight = 5,
@@ -237,6 +265,40 @@ shinyServer( function(input, output,session) {
     
     
   })
+  
+  ################ ONGLET 2 ###########
+  
+  output$debitparmois <- renderPlot({
+    
+    month = c("Janvier","Fevrier","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Decembre")
+    
+    tibble(mois = DEBITMOY$mois, taux = DEBITMOY$debit) %>%
+      group_by(mois) %>%
+      summarise(taux = mean(taux)) %>%
+      ggplot(aes(mois, taux,fill = month)) +
+      ggtitle("Moyenne du débit par jours") +
+      geom_bar(stat = "identity") +
+      scale_x_continuous(breaks = 1:12) +
+      theme_light()
+    
+    
+  })
+  
+  output$debitparans <- renderPlot({
+    
+    annee = c("2013","2014","2015","2016")
+    
+    tibble(mois = DEBITMOY$annee, taux = DEBITMOY$debit) %>%
+      group_by(mois) %>%
+      summarise(taux = mean(taux)) %>%
+      ggplot(aes(mois, taux,fill = annee)) +
+      ggtitle("Moyenne du débit par annee") +
+      geom_bar(stat = "identity") +
+      scale_x_continuous(breaks = 1:12) +
+      theme_light()
+    
+  })
+  
   
 })
   
