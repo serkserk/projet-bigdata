@@ -112,6 +112,25 @@ loadYearMonthDebit <- function(){
   
 }
 
+loadHourDebit <- function(){
+  
+  agg = tra$aggregate(
+    '[
+  { "$group": { 
+    "_id": { 
+      "heure": { "$hour": "$date" }
+    }, 
+    "debit": { "$avg": "$debit" }
+  }}
+]')
+  
+  res <- na.omit(agg)
+  df <- data.frame(res$`_id`$heure,res$debit)
+  colnames(df) <- c("heure","debit")
+  return(df)
+  
+}
+
 
 loadDebitDays <- function(){
   
@@ -147,6 +166,7 @@ loadDebitDays <- function(){
 TRAFFIC_ANNEE <- read.csv("debittaux.csv",row.names = 1)
 DEBITMOY <- read.csv("DEBITMOY.csv",row.names = 1)
 DEBITJOUR <- read.csv("debitjour.csv",row.names = 1)
+DEBITHEURE <-read.csv("DEBITHEURE.csv", row.names = 1)
 
 ################### SERVER ##################
 
@@ -341,6 +361,21 @@ shinyServer( function(input, output,session) {
       geom_bar(stat = "identity") +
       scale_x_continuous(breaks = 1:7) +
       theme_light()
+    
+  })
+  
+  output$debitheure <- renderPlot({
+    
+    heure = 1:24
+    tibble(mois = DEBITHEURE$heure, taux = DEBITHEURE$debit) %>%
+      group_by(mois) %>%
+      summarise(taux = mean(taux)) %>%
+      ggplot(aes(mois, taux)) + xlab("heure de la journée")+
+      ggtitle("Moyenne du débit par jours") +
+      geom_bar(stat = "identity") +
+      scale_x_continuous(breaks = 1:24) +
+      theme_light()
+    
     
   })
   
