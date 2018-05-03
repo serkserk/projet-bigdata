@@ -9,7 +9,7 @@ library(shinythemes)
 
 
 ui <- fluidPage( theme = shinytheme("flatly"),
-  
+    
   navbarPage( "Menu",
               
               tabPanel("Carte des capteurs",
@@ -44,7 +44,10 @@ ui <- fluidPage( theme = shinytheme("flatly"),
                  
 
                ),
-               plotOutput(outputId = "debitjour")
+               shiny::splitLayout(
+               plotOutput(outputId = "debitjour",width = "100%"),
+               plotOutput(outputId = "debitheure",width = "100%")
+               )
                
         )
   )

@@ -119,7 +119,8 @@ loadDebitDays <- function(){
     '[
   { "$group": { 
     "_id": { 
-      "jour": { "$dayOfWeek": "$date" }
+      "jour": { "$dayOfWeek": "$date" },
+      "heure" : { "$hour" : "$date"}
     }, 
     "debit": { "$avg": "$debit" }
   }}
@@ -193,12 +194,16 @@ shinyServer( function(input, output,session) {
 
         info %>% 
           mutate(annee = format(date, "%Y"), 
-                 jour = format(date, "%j")) %>%
-          ggplot(aes(jour, tauxNum, col = annee)) +
-          geom_line() +
-          theme_classic()
-        
+                 mois = format(date, "%m")) %>%
+          group_by(mois, annee) %>%
+          
+          summarise(moy_taux = mean(tauxNum, na.rm = TRUE)) %>%
+            ggplot(aes(mois, moy_taux, col = annee, group = annee)) +
+            geom_line() +
+            theme_classic()
     })
+      
+      
       
       output$mois <- renderPlot({
         
