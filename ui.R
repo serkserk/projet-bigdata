@@ -20,6 +20,7 @@ ui <- fluidPage( theme = shinytheme("flatly"),
                   
                   selectInput(inputId = "top", label = strong("Filtre : "),
                               choices = c("toute les stations" , "Station avec le plus de traffic", "Station avec le moins de traffic","heatmap traffic")),
+                  plotOutput(outputId = "prediction"),
                   plotOutput(outputId = "series",width = "100%",height = "280px"),
                   plotOutput(outputId = "mois",width = "100%",height = "280px"),
                   plotOutput(outputId = "jour",width = "100%",height = "280px")

@@ -7,6 +7,8 @@ library(leaflet)
 library(dplyr)
 library(ggplot2)
 library(leaflet.extras)
+library(fpp)
+library(forecast)
 
 ################### CONNECTION TO MONGO #######################
 
@@ -152,6 +154,34 @@ loadDebitDays <- function(){
   
 }
 
+PredictDebit <- function(number){
+  
+  query = paste( '[
+    {"$match" : { "id" :',number,'}},
+          { "$group": { 
+          "_id": { 
+          "id" : "number",
+          "annee": { "$year": "$date" },
+          "mois": { "$month": "$date" }
+          }, 
+          "taux": { "$avg": "$debit" }
+          }}
+          ]')
+  
+  trafic_agg = tra$aggregate(query)
+
+  trafic_agg <- data.frame(trafic_agg$`_id`$annee,trafic_agg$`_id`$mois,trafic_agg$taux)
+  colnames(trafic_agg)<-c('annee', 'mois', 'taux')
+  
+  trafic_agg<-trafic_agg[order(trafic_agg$annee,trafic_agg$mois),]
+  
+  z <- ts(trafic_agg$taux, frequency = 12, start = c(2013, 1))
+  #on met la date en index
+  ts1 = ts(z, frequency=12)
+  fit <- auto.arima(ts1)
+  
+}
+
 
 ############ VARIABLES GLOBALES  ################
 
@@ -250,6 +280,12 @@ shinyServer( function(input, output,session) {
         
       })
       
+      output$prediction <- renderPlot({
+        fit <- PredictDebit(click$id)
+        plot(forecast(fit,h=12),ylab = "débit", main="prediction du débit")
+        
+      })
+      
       
     }
     
@@ -330,7 +366,7 @@ shinyServer( function(input, output,session) {
     tibble(mois = DEBITMOY$annee, taux = DEBITMOY$debit) %>%
       group_by(mois) %>%
       summarise(taux = mean(taux)) %>%
-      ggplot(aes(mois, taux,fill = annee)) +  geom_bar(stat = "identity") + coord_cartesian(ylim = c(770,865)) +
+      ggplot(aes(mois, taux)) +  geom_bar(stat = "identity") + coord_cartesian(ylim = c(770,865)) +
       ggtitle("Moyenne du débit par annee") + 
       xlab("annee") 
     
@@ -346,7 +382,7 @@ shinyServer( function(input, output,session) {
     tibble(mois = DEBITJOUR$jour, taux = DEBITJOUR$debit) %>%
       group_by(mois) %>%
       summarise(taux = mean(taux)) %>%
-      ggplot(aes(mois, taux,fill = jour)) + xlab("jour de la semaine")+ coord_cartesian(ylim = c(600,1000)) +
+      ggplot(aes(mois, taux)) + xlab("jour de la semaine")+ coord_cartesian(ylim = c(600,1000)) +
       ggtitle("Moyenne du débit par jours") +
       geom_bar(stat = "identity") +
       scale_x_continuous(breaks = 1:7) 
@@ -363,7 +399,7 @@ shinyServer( function(input, output,session) {
         tibble(mois = DEBITMOY$mois, taux = DEBITMOY$debit) %>%
           group_by(mois) %>%
           summarise(taux = mean(taux)) %>%
-          ggplot(aes(mois, taux,fill = month)) + coord_cartesian(ylim = c(600,900)) +
+          ggplot(aes(mois, taux)) + coord_cartesian(ylim = c(600,900)) +
           ggtitle("Moyenne du débit par jours") +
           geom_bar(stat = "identity") +
           scale_x_continuous(breaks = 1:12)
