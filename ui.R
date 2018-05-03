@@ -8,60 +8,103 @@ library(shinythemes)
 library(shinydashboard)
 
 
-
-ui <- fluidPage( theme = shinytheme("flatly"),
+ui <- fluidPage(
+  shinythemes::themeSelector(),
+  
+  navbarPage(
+    "Trafic Paris",
     
-  navbarPage( "Menu",
-              
-              tabPanel("Carte des capteurs",
-              
-              sidebarLayout(
-                
-                sidebarPanel(
-                  
-                  selectInput(inputId = "top", label = strong("Filtre : "),
-                              choices = c("toute les stations" , "Station avec le plus de traffic", "Station avec le moins de traffic","heatmap traffic")),
-                  plotOutput(outputId = "prediction"),
-                  plotOutput(outputId = "series",width = "100%",height = "280px"),
-                  plotOutput(outputId = "mois",width = "100%",height = "280px"),
-                  plotOutput(outputId = "jour",width = "100%",height = "280px")
-                  
-                ),
-                
-                mainPanel(
-                  
-                  fluidRow(
-                    valueBoxOutput("countCap"),
-                    valueBoxOutput("countTra")),
-                  
-                  
-                  titlePanel("Carte des capteurs"),
-                  leafletOutput("Carte_capteurs"),
-                  dataTableOutput(outputId = "tabTop")
-                  
-              )
-        )
-      ),
-      tabPanel("Info sur le trafic",
-               
-               
-            sidebarLayout(
-              
-              sidebarPanel(
-                selectInput(inputId = "choix", label = strong("Moyenne du débit : "),
-                            choices = c("par annee" , "par mois", "par jour","par heure"))
-              ),
+    tabPanel(
+      "Acceuil",
+      
+      navlistPanel(
+        tabPanel("Le projet",
                  
-              mainPanel(
-                
-              plotOutput(outputId = "debitmoyen",width = "100%")
-              
-              )
-              
-            )
-              
+                 mainPanel(textOutput("text1"))),
+        tabPanel("Les données ",
+                 
+                 mainPanel(
+                   textOutput("text2"),
+                   fluidRow(valueBoxOutput("countCap"),
+                            valueBoxOutput("countTra"))
+                 )),
+        "-----",
+        tabPanel("L'équipe",
+                 
+                 mainPanel(textOutput("text3")))
+      )
+    ),
+    
+    tabPanel("Carte des capteurs",
+             
+             sidebarLayout(
+               sidebarPanel(
+                 selectInput(
+                   inputId = "top",
+                   label = strong("Filtre : "),
+                   choices = c(
+                     "toute les stations" ,
+                     "Station avec le plus de traffic",
+                     "Station avec le moins de traffic",
+                     "heatmap traffic"
+                   )
+                 ),
+                 plotOutput(outputId = "prediction"),
+                 plotOutput(
+                   outputId = "series",
+                   width = "100%",
+                   height = "280px"
+                 ),
+                 plotOutput(
+                   outputId = "mois",
+                   width = "100%",
+                   height = "280px"
+                 ),
+                 plotOutput(
+                   outputId = "jour",
+                   width = "100%",
+                   height = "280px"
+                 )
+                 
+               ),
                
+               mainPanel(
+                 titlePanel("Carte des capteurs"),
+                 leafletOutput("Carte_capteurs"),
+                 dataTableOutput(outputId = "tabTop")
+                 
+               )
+             )),
+    tabPanel("Info sur le trafic",
+             
+             sidebarLayout(
+               sidebarPanel(
+                 #selectInput(inputId = "choix",
+                 #label = strong("Moyenne du débit : "),
+                 #            choices = c("par annee" , "par mois", "par jour","par heure"))
+                 #),
+                 radioButtons(
+                   "choix",
+                   label = "Moyenne du débit:",
+                   choices = c("par annee",
+                               "par mois",
+                               "par jour",
+                               "par heure"),
+                   selected = "par annee"
+                 )
+               ),
                
-        )
+               mainPanel(plotOutput(outputId = "debitmoyen", width = "100%"))
+               
+             )),
+    
+    
+    tabPanel("Clustering",
+             
+             mainPanel(
+               plotOutput(outputId = "cluster", width = "100%")
+               
+             ))
+    
   )
 )
