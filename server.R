@@ -324,11 +324,10 @@ shinyServer( function(input, output,session) {
     tibble(mois = DEBITMOY$mois, taux = DEBITMOY$debit) %>%
       group_by(mois) %>%
       summarise(taux = mean(taux)) %>%
-      ggplot(aes(mois, taux,fill = month)) +
+      ggplot(aes(mois, taux,fill = month)) + coord_cartesian(ylim = c(600,900)) +
       ggtitle("Moyenne du débit par jours") +
       geom_bar(stat = "identity") +
-      scale_x_continuous(breaks = 1:12) +
-      theme_light()
+      scale_x_continuous(breaks = 1:12)
     
     
   })
@@ -340,12 +339,9 @@ shinyServer( function(input, output,session) {
     tibble(mois = DEBITMOY$annee, taux = DEBITMOY$debit) %>%
       group_by(mois) %>%
       summarise(taux = mean(taux)) %>%
-      ggplot(aes(mois, taux,fill = annee)) +
+      ggplot(aes(mois, taux,fill = annee)) +  geom_bar(stat = "identity") + coord_cartesian(ylim = c(770,865)) +
       ggtitle("Moyenne du débit par annee") + 
-      xlab("annee") +
-      geom_bar(stat = "identity") + 
-      scale_x_continuous(breaks = 1:12) +
-      theme_light()
+      xlab("annee") 
     
   })
   
@@ -356,11 +352,10 @@ shinyServer( function(input, output,session) {
     tibble(mois = DEBITJOUR$jour, taux = DEBITJOUR$debit) %>%
       group_by(mois) %>%
       summarise(taux = mean(taux)) %>%
-      ggplot(aes(mois, taux,fill = jour)) + xlab("jour de la semaine")+
+      ggplot(aes(mois, taux,fill = jour)) + xlab("jour de la semaine")+ coord_cartesian(ylim = c(600,1000)) +
       ggtitle("Moyenne du débit par jours") +
       geom_bar(stat = "identity") +
-      scale_x_continuous(breaks = 1:7) +
-      theme_light()
+      scale_x_continuous(breaks = 1:7) 
     
   })
   
@@ -371,10 +366,9 @@ shinyServer( function(input, output,session) {
       group_by(mois) %>%
       summarise(taux = mean(taux)) %>%
       ggplot(aes(mois, taux)) + xlab("heure de la journée")+
-      ggtitle("Moyenne du débit par jours") +
+      ggtitle("Moyenne du débit par heure") +
       geom_bar(stat = "identity") +
-      scale_x_continuous(breaks = 1:24) +
-      theme_light()
+      scale_x_continuous(breaks = 1:24) 
     
     
   })
