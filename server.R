@@ -426,6 +426,26 @@ shinyServer( function(input, output,session) {
   })
   
   
+  output$countCap <- renderValueBox({
+    valueBox(
+      value = cap$count(),
+      subtitle = "Total capteurs",
+      icon =icon("list"),
+      color = "blue"
+    )
+  })
+  
+  output$countTra <- renderValueBox({
+    valueBox(
+      tra$count(),
+      "Total captures",
+      icon =  icon("list"),
+      color = "yellow"
+    )
+  })
+  
+  
+  
 })
   
   

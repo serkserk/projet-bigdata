@@ -29,6 +29,11 @@ ui <- fluidPage( theme = shinytheme("flatly"),
                 
                 mainPanel(
                   
+                  fluidRow(
+                    valueBoxOutput("countCap"),
+                    valueBoxOutput("countTra")),
+                  
+                  
                   titlePanel("Carte des capteurs"),
                   leafletOutput("Carte_capteurs"),
                   dataTableOutput(outputId = "tabTop")
