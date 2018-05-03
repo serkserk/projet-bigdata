@@ -101,18 +101,18 @@ ui <- fluidPage(
                    selected = "par annee"
                  )
                ),
-               
                mainPanel(plotOutput(outputId = "debitmoyen", width = "100%"))
-               
              )),
     
     
-    tabPanel("Clustering",
-             
-             mainPanel(
-               plotOutput(outputId = "cluster", width = "100%")
-               
-             ))
-    
+    tabPanel(
+      "Clustering",
+      
+      mainPanel(
+        titlePanel("Clustering des capteurs"),
+        leafletOutput("Clust_capteurs"),
+        dataTableOutput(outputId = "tabTop2")
+      )
+    )
   )
 )

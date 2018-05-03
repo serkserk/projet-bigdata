@@ -186,7 +186,7 @@ PredictDebit <- function(number) {
   colnames(trafic_agg) <- c('annee', 'mois', 'taux')
   
   trafic_agg <-
-    trafic_agg[order(trafic_agg$annee, trafic_agg$mois),]
+    trafic_agg[order(trafic_agg$annee, trafic_agg$mois), ]
   
   z <- ts(trafic_agg$taux,
           frequency = 12,
@@ -262,8 +262,6 @@ shinyServer(function(input, output, session) {
           theme_classic()
       })
       
-      
-      
       output$mois <- renderPlot({
         info %>% mutate(heure = format(date, "%H"),
                         mois = format(date, "%m")) %>%
@@ -272,7 +270,6 @@ shinyServer(function(input, output, session) {
           ggplot(aes(heure, moy, col = mois, group = mois)) +
           geom_line() +
           theme_classic()
-        
       })
       
       output$jour <- renderPlot({
@@ -283,7 +280,6 @@ shinyServer(function(input, output, session) {
           ggplot(aes(heure, moy, col = jour, group = jour)) +
           geom_line() +
           theme_classic()
-        
       })
       
       output$prediction <- renderPlot({
@@ -291,12 +287,8 @@ shinyServer(function(input, output, session) {
         plot(forecast(fit, h = 12), ylab = "débit", main = "prediction du débit")
         
       })
-      
-      
     }
-    
   })
-  
   
   observeEvent(input$top, {
     # Connection a la carte
@@ -306,28 +298,23 @@ shinyServer(function(input, output, session) {
     
     # TABLE DES DONNEES TRIER
     merged <- merge(geo, TRAFFIC_ANNEE)
-    ord <- merged[order(merged$taux),]
-    ord <- ord[which(ord$taux > 0),]
+    ord <- merged[order(merged$taux), ]
+    ord <- ord[which(ord$taux > 0), ]
     
     proxy %>% clearMarkers()
     
     if (input$top == "Station avec le plus de traffic") {
       print("test")
-      top <- ord[(nrow(ord) - 49):(nrow(ord)),]
+      top <- ord[(nrow(ord) - 49):(nrow(ord)), ]
       print(nrow(ord))
       
     }
-    
     else if (input$top == "Station avec le moins de traffic") {
-      top <- ord[1:50,]
-      
+      top <- ord[1:50, ]
     }
-    
-    
     else{
       top <- ord
     }
-    
     
     popup <- paste0("<strong> Station Id :  </strong>", top$id)
     proxy %>% addCircleMarkers(
@@ -342,7 +329,6 @@ shinyServer(function(input, output, session) {
       color = "blue"
     )
     
-    
     if (input$top == "heatmap traffic") {
       proxy %>% clearMarkers()
       proxy %>% addHeatmap(data = top, intensity = ~ taux / 100)
@@ -352,7 +338,6 @@ shinyServer(function(input, output, session) {
       top
       
     })
-    
     
   })
   
@@ -419,7 +404,6 @@ shinyServer(function(input, output, session) {
           geom_bar(stat = "identity") +
           scale_x_continuous(breaks = 1:12)
         
-        
       })
     }
     
@@ -432,7 +416,6 @@ shinyServer(function(input, output, session) {
           ggtitle("Moyenne du débit par heure") +
           geom_bar(stat = "identity") +
           scale_x_continuous(breaks = 0:23)
-        
         
       })
     }
@@ -467,7 +450,5 @@ shinyServer(function(input, output, session) {
              icon =  icon("list"),
              color = "yellow")
   })
-  
-  
   
 })
