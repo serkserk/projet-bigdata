@@ -317,22 +317,13 @@ shinyServer( function(input, output,session) {
   
   ################ ONGLET 2 ###########
   
-  output$debitparmois <- renderPlot({
+  observeEvent(input$choix,{
     
-    month = c("Janvier","Fevrier","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Decembre")
+
     
-    tibble(mois = DEBITMOY$mois, taux = DEBITMOY$debit) %>%
-      group_by(mois) %>%
-      summarise(taux = mean(taux)) %>%
-      ggplot(aes(mois, taux,fill = month)) + coord_cartesian(ylim = c(600,900)) +
-      ggtitle("Moyenne du débit par jours") +
-      geom_bar(stat = "identity") +
-      scale_x_continuous(breaks = 1:12)
-    
-    
-  })
+  if(input$choix == "par annee"){
   
-  output$debitparans <- renderPlot({
+  output$debitmoyen <- renderPlot({
     
     annee = c("2013","2014","2015","2016")
     
@@ -344,8 +335,11 @@ shinyServer( function(input, output,session) {
       xlab("annee") 
     
   })
+  }
   
-  output$debitjour <- renderPlot({
+  else if(input$choix == "par jour"){
+  
+  output$debitmoyen <- renderPlot({
     
     jour = c("dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi")
     
@@ -358,19 +352,41 @@ shinyServer( function(input, output,session) {
       scale_x_continuous(breaks = 1:7) 
     
   })
-  
-  output$debitheure <- renderPlot({
+  }
     
-    heure = 1:24
+    else if(input$choix == "par mois"){
+      
+      output$debitmoyen <- renderPlot({
+        
+        month = c("Janvier","Fevrier","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Decembre")
+        
+        tibble(mois = DEBITMOY$mois, taux = DEBITMOY$debit) %>%
+          group_by(mois) %>%
+          summarise(taux = mean(taux)) %>%
+          ggplot(aes(mois, taux,fill = month)) + coord_cartesian(ylim = c(600,900)) +
+          ggtitle("Moyenne du débit par jours") +
+          geom_bar(stat = "identity") +
+          scale_x_continuous(breaks = 1:12)
+        
+        
+      })
+    }
+  
+  else if(input$choix == "par heure"){
+  output$debitmoyen <- renderPlot({
+    
     tibble(mois = DEBITHEURE$heure, taux = DEBITHEURE$debit) %>%
       group_by(mois) %>%
       summarise(taux = mean(taux)) %>%
       ggplot(aes(mois, taux)) + xlab("heure de la journée")+
       ggtitle("Moyenne du débit par heure") +
       geom_bar(stat = "identity") +
-      scale_x_continuous(breaks = 1:24) 
+      scale_x_continuous(breaks = 0:23) 
     
     
+  })
+  }
+  
   })
   
   

@@ -36,18 +36,24 @@ ui <- fluidPage( theme = shinytheme("flatly"),
         )
       ),
       tabPanel("Info sur le trafic",
+               
+               
+            sidebarLayout(
+              
+              sidebarPanel(
+                selectInput(inputId = "choix", label = strong("Moyenne du débit : "),
+                            choices = c("par annee" , "par mois", "par jour","par heure"))
+              ),
                  
-               shiny::splitLayout(
-                 
-                 plotOutput(outputId = "debitparmois",width = "100%"),
-                 plotOutput(outputId = "debitparans",width = "99%")
-                 
-
-               ),
-               shiny::splitLayout(
-               plotOutput(outputId = "debitjour",width = "100%"),
-               plotOutput(outputId = "debitheure",width = "100%")
-               )
+              mainPanel(
+                
+              plotOutput(outputId = "debitmoyen",width = "100%")
+              
+              )
+              
+            )
+              
+               
                
         )
   )
