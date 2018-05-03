@@ -185,7 +185,8 @@ PredictDebit <- function(number) {
                trafic_agg$taux)
   colnames(trafic_agg) <- c('annee', 'mois', 'taux')
   
-  trafic_agg <- trafic_agg[order(trafic_agg$annee, trafic_agg$mois), ]
+  trafic_agg <-
+    trafic_agg[order(trafic_agg$annee, trafic_agg$mois),]
   
   z <- ts(trafic_agg$taux,
           frequency = 12,
@@ -305,20 +306,20 @@ shinyServer(function(input, output, session) {
     
     # TABLE DES DONNEES TRIER
     merged <- merge(geo, TRAFFIC_ANNEE)
-    ord <- merged[order(merged$taux), ]
-    ord <- ord[which(ord$taux > 0), ]
+    ord <- merged[order(merged$taux),]
+    ord <- ord[which(ord$taux > 0),]
     
     proxy %>% clearMarkers()
     
     if (input$top == "Station avec le plus de traffic") {
       print("test")
-      top <- ord[(nrow(ord) - 49):(nrow(ord)), ]
+      top <- ord[(nrow(ord) - 49):(nrow(ord)),]
       print(nrow(ord))
       
     }
     
     else if (input$top == "Station avec le moins de traffic") {
-      top <- ord[1:50, ]
+      top <- ord[1:50,]
       
     }
     
@@ -438,6 +439,18 @@ shinyServer(function(input, output, session) {
     
   })
   
+  ###### ONGLET ACCEUIL ######
+  
+  
+  output$acc1 <-
+    renderText({
+      toJSON(cap$find(limit = 1), pretty = T)
+    })
+  
+  output$acc2 <-
+    renderText({
+      toJSON(tra$find(limit = 1), pretty = T)
+    })
   
   output$countCap <- renderValueBox({
     valueBox(

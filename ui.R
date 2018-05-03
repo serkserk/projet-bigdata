@@ -18,16 +18,24 @@ ui <- fluidPage(
       "Acceuil",
       
       navlistPanel(
-        tabPanel("Le projet",
-                 
-                 mainPanel(textOutput("text1"))),
-        tabPanel("Les données ",
-                 
-                 mainPanel(
-                   textOutput("text2"),
-                   fluidRow(valueBoxOutput("countCap"),
-                            valueBoxOutput("countTra"))
-                 )),
+        tabPanel("Le projet"),
+        tabPanel(
+          "Les données ",
+          
+          mainPanel(
+            textOutput("text2"),
+            fluidRow(valueBoxOutput("countCap"),
+                     valueBoxOutput("countTra"))
+          ),
+          
+          
+          mainPanel(tabsetPanel(
+            tabPanel("Capteur",
+                     verbatimTextOutput("acc1")),
+            tabPanel("Traffic",
+                     verbatimTextOutput("acc2"))
+          ))
+        ),
         "-----",
         tabPanel("L'équipe",
                  
