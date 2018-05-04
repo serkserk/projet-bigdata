@@ -6,6 +6,7 @@ library(shiny)
 library(leaflet)
 library(shinythemes)
 library(shinydashboard)
+library(jsonlite)
 
 
 ui <- fluidPage(
