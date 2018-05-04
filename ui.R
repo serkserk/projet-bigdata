@@ -53,10 +53,10 @@ ui <- fluidPage(
                    inputId = "top",
                    label = strong("Filtre : "),
                    choices = c(
-                     "toute les stations" ,
+                     "Toute les stations" ,
                      "Station avec le plus de traffic",
                      "Station avec le moins de traffic",
-                     "heatmap traffic"
+                     "Heatmap traffic"
                    ),
                    selected =  "toute les stations"
                  ),
@@ -121,7 +121,12 @@ ui <- fluidPage(
       mainPanel(
         titlePanel("Clustering des capteurs"),
         leafletOutput("Clust_capteurs"),
-        dataTableOutput(outputId = "tabTop2")
+        dataTableOutput(outputId = "tabTop2"),
+        splitLayout(
+          plotOutput(outputId = "clustplot3"),
+          plotOutput(outputId = "clustplot2"),
+          plotOutput(outputId = "clustplot1")
+        )
       )
     )
   )

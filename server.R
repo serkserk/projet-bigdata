@@ -186,7 +186,7 @@ PredictDebit <- function(number) {
   colnames(trafic_agg) <- c('annee', 'mois', 'taux')
   
   trafic_agg <-
-    trafic_agg[order(trafic_agg$annee, trafic_agg$mois),]
+    trafic_agg[order(trafic_agg$annee, trafic_agg$mois), ]
   
   z <- ts(trafic_agg$taux,
           frequency = 12,
@@ -234,8 +234,8 @@ shinyServer(function(input, output, session) {
   output$Carte_capteurs <- renderLeaflet({
     # TABLE DES DONNEES TRIER
     merged <- merge(geo, TRAFFIC_ANNEE)
-    ord <- merged[order(merged$taux),]
-    ord <- ord[which(ord$taux > 0),]
+    ord <- merged[order(merged$taux), ]
+    ord <- ord[which(ord$taux > 0), ]
     top <- ord
     popup <- paste0("<strong> Station Id :  </strong>", top$id)
     paris %>% addCircleMarkers(
@@ -256,77 +256,65 @@ shinyServer(function(input, output, session) {
   
   ################### SERVER ##################
   
-  introduction <- 'Projet de Big Data :
-  
-  Ce projet est réalisé dans le cadre de l’UE Big Data. Il consiste en la conception d’une application web en R et shiny,
-  sur les données de trafic de la ville de Paris présent dans une base de données MongoDB.
-  Dans cette application R shiny, nous avons développé un outil de classification des stations selon leurs profils d’utilisation durant la journée.
-  Nous avons également réalisé un outil de prédiction du débit mensuelle sur l’année 2018,
-  automatisé pour chaque station sélectionnée par l’utilisateur.
-  Divers filtres sur la carte des stations sont mis à disposition et plusieurs graphiques permettront d’explorer le profil de chaque station.
-  Enfin Un onglet permet d’avoir une vue globale du trafic de la ville de Paris.'
-  
-  output$introduction <- renderText({
-    introduction
-  })
-  
-  equipe = "
-  -	Enseignant : Francois Xavier Jollois
-  -	AZAP Serkan, GUIHEUX Killian, GUILLO Corentin Guillo
-  "
-  
-  output$equipe <- renderText({
-    equipe
-  })
-  
   ############ ONGLET 1 CARTE CAPTEURS ##########
   
   # Event when a stationis clicked
   observeEvent(input$Carte_capteurs_marker_click, {
-    click <- input$Carte_capteurs_marker_click
+    withProgress(message = "chargement...",
+                 detail = "veuillez attendre",
+                 value = 0.1,
+                 {
+                   click <- input$Carte_capteurs_marker_click
+                   
+                   # Load the sation info of the clicked station
+                   info <- loadStationInfo(click$id)
+                   
+                   # Check si des données sont disponibles :
+                   
+                   if (info$id[[1]] %in% listeIds) {
+                     output$series <- renderPlot({
+                       info %>%
+                         mutate(annee = format(date, "%Y"),
+                                mois = format(date, "%m")) %>%
+                         group_by(mois, annee) %>%
+                         
+                         summarise(moy_taux = mean(tauxNum, na.rm = TRUE)) %>%
+                         ggplot(aes(mois, moy_taux, col = annee, group = annee)) +
+                         geom_line()
+                     })
+                     
+                     output$mois <- renderPlot({
+                       info %>% mutate(heure = format(date, "%H"),
+                                       mois = format(date, "%m")) %>%
+                         group_by(heure, mois) %>%
+                         summarise(moy = mean(tauxNum, na.rm = TRUE)) %>%
+                         ggplot(aes(heure, moy, col = mois, group = mois)) +
+                         geom_line()
+                     })
+                     
+                     output$jour <- renderPlot({
+                       info %>% mutate(heure = format(date, "%H"),
+                                       jour = format(date, "%A")) %>%
+                         group_by(heure, jour) %>%
+                         summarise(moy = mean(tauxNum, na.rm = TRUE)) %>%
+                         ggplot(aes(heure, moy, col = jour, group = jour)) +
+                         geom_line() +
+                         theme_classic()
+                     })
+                     
+                     output$prediction <- renderPlot({
+                       fit <- PredictDebit(click$id)
+                       plot(forecast(fit, h = 12),
+                            ylab = "débit",
+                            main = "prediction du débit")
+                       
+                     })
+                   }
+                   
+                   incProgress(1)
+                 })
     
-    # Load the sation info of the clicked station
-    info <- loadStationInfo(click$id)
     
-    # Check si des données sont disponibles :
-    
-    if (info$id[[1]] %in% listeIds) {
-      output$series <- renderPlot({
-        info %>%
-          mutate(annee = format(date, "%Y"),
-                 mois = format(date, "%m")) %>%
-          group_by(mois, annee) %>%
-          
-          summarise(moy_taux = mean(tauxNum, na.rm = TRUE)) %>%
-          ggplot(aes(mois, moy_taux, col = annee, group = annee)) +
-          geom_line()
-      })
-      
-      output$mois <- renderPlot({
-        info %>% mutate(heure = format(date, "%H"),
-                        mois = format(date, "%m")) %>%
-          group_by(heure, mois) %>%
-          summarise(moy = mean(tauxNum, na.rm = TRUE)) %>%
-          ggplot(aes(heure, moy, col = mois, group = mois)) +
-          geom_line()
-      })
-      
-      output$jour <- renderPlot({
-        info %>% mutate(heure = format(date, "%H"),
-                        jour = format(date, "%A")) %>%
-          group_by(heure, jour) %>%
-          summarise(moy = mean(tauxNum, na.rm = TRUE)) %>%
-          ggplot(aes(heure, moy, col = jour, group = jour)) +
-          geom_line() +
-          theme_classic()
-      })
-      
-      output$prediction <- renderPlot({
-        fit <- PredictDebit(click$id)
-        plot(forecast(fit, h = 12), ylab = "débit", main = "prediction du débit")
-        
-      })
-    }
   })
   
   
@@ -338,23 +326,23 @@ shinyServer(function(input, output, session) {
     
     # TABLE DES DONNEES TRIER
     merged <- merge(geo, TRAFFIC_ANNEE)
-    ord <- merged[order(merged$taux),]
-    ord <- ord[which(ord$taux > 0),]
+    ord <- merged[order(merged$taux), ]
+    ord <- ord[which(ord$taux > 0), ]
     
     proxy %>% clearMarkers()
     
-    if (input$top == "toute les stations") {
+    if (input$top == "Toute les stations") {
       top <- ord
       
     }
     else if (input$top == "Station avec le plus de traffic") {
       print("test")
-      top <- ord[(nrow(ord) - 49):(nrow(ord)),]
+      top <- ord[(nrow(ord) - 49):(nrow(ord)), ]
       print(nrow(ord))
       
     }
     else if (input$top == "Station avec le moins de traffic") {
-      top <- ord[1:50,]
+      top <- ord[1:50, ]
     }
     
     popup <- paste0("<strong> Station Id :  </strong>", top$id)
@@ -370,7 +358,7 @@ shinyServer(function(input, output, session) {
       color = "blue"
     )
     
-    if (input$top == "heatmap traffic") {
+    if (input$top == "Heatmap traffic") {
       proxy %>% clearMarkers()
       proxy %>% addHeatmap(data = top, intensity = ~ taux / 100)
     }
@@ -474,7 +462,7 @@ shinyServer(function(input, output, session) {
     output$minitable <- renderDataTable({
       print(d)
       as.data.frame(d)
-    })
+    }, options = list(paging = FALSE, searching = FALSE))
     
     
   })
@@ -508,32 +496,93 @@ shinyServer(function(input, output, session) {
   })
   
   
+  
   # Carte de paris
   output$Clust_capteurs <- renderLeaflet({
-    load("data.RData")
-    
-    
-    
-    paris = leaflet() %>% addTiles %>%
-      setView(lng = 2.34,
-              lat = 48.855,
-              zoom = 12) %>%
-      addProviderTiles(providers$Stamen.TonerLite)
-    
-    paris %>%
-      addCircleMarkers(
-        data = merged,
-        lng = ~ lng,
-        lat = ~ lat,
-        weight = 1,
-        radius = 20 * merged[, 12] / max(merged[, 12]),
-        fillOpacity = 1,
-        fillColor = pal(clust2@cluster)
-      )
-    
-    
+    withProgress(message = "chargement...",
+                 detail = "veuillez attendre",
+                 value = 0.1,
+                 {
+                   load("data.RData")
+                   
+                   paris = leaflet() %>% addTiles %>%
+                     setView(lng = 2.34,
+                             lat = 48.855,
+                             zoom = 12) %>%
+                     addProviderTiles(providers$Stamen.TonerLite)
+                   
+                   
+                   paris %>%
+                     addCircleMarkers(
+                       data = merged,
+                       lng = ~ lng,
+                       lat = ~ lat,
+                       weight = 1,
+                       radius = 20 * merged[, 12] / max(merged[, 12]),
+                       fillOpacity = 1,
+                       fillColor = pal(clust2@cluster)
+                     )
+                   
+                   incProgress(1)
+                 })
   })
   
+  
+  output$clustplot1 <- renderPlot(withProgress(
+    message = "chargement...",
+    detail = "veuillez attendre",
+    value = 0.1,
+    {
+      plot(clust2)
+      incProgress(1)
+    }
+  ))
+  
+  output$clustplot2 <- renderPlot(withProgress(
+    message = "chargement...",
+    detail = "veuillez attendre",
+    value = 0.1,
+    {
+      plot(ts(as.data.frame(clust2@centroids)))
+      incProgress(1)
+    }
+  ))
+  
+  output$clustplot3 <- renderPlot(withProgress(
+    message = "chargement...",
+    detail = "veuillez attendre",
+    value = 0.1,
+    {
+      plot(clust2, type = "sc")
+      incProgress(1)
+    }
+  ))
+  
+  
+  introduction <- 'Projet de Big Data :
+  
+  Ce projet est réalisé dans le cadre de l’UE Big Data. Il consiste en la conception d’une application web en R et shiny,
+  sur les données de trafic de la ville de Paris présent dans une base de données MongoDB.
+  Dans cette application R shiny, nous avons développé un outil de classification des stations selon leurs profils d’utilisation durant la journée.
+  Nous avons également réalisé un outil de prédiction du débit mensuelle sur l’année 2018,
+  automatisé pour chaque station sélectionnée par l’utilisateur.
+  Divers filtres sur la carte des stations sont mis à disposition et plusieurs graphiques permettront d’explorer le profil de chaque station.
+  Enfin Un onglet permet d’avoir une vue globale du trafic de la ville de Paris.'
+  
+  output$introduction <- renderText({
+    introduction
+  })
+  
+  equipe = "
+  -	Enseignant : Francois Xavier Jollois
+  -	AZAP Serkan - AZAP-serkan@hotmail.fr
+  GUIHEUX Killian - killian.guiheux@gmail.com
+  GUILLO Corentin Guillo - corentin_guillo@hotmail.fr
+  "
+  
+  output$equipe <- renderText({
+    equipe
+  })
   
   
 })
