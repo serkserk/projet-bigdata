@@ -344,21 +344,34 @@ shinyServer(function(input, output, session) {
   ################ ONGLET 2 ###########
   
   observeEvent(input$choix, {
+    
     if (input$choix == "par annee") {
+      
+      d <- tibble(mois = DEBITMOY$annee, debit = DEBITMOY$debit) %>%
+        group_by(mois) %>%
+        summarise(debit = mean(debit))
+      
+      
       output$debitmoyen <- renderPlot({
         annee = c("2013", "2014", "2015", "2016")
         
-        tibble(mois = DEBITMOY$annee, taux = DEBITMOY$debit) %>%
-          group_by(mois) %>%
-          summarise(taux = mean(taux)) %>%
-          ggplot(aes(mois, taux)) +  geom_bar(stat = "identity") + coord_cartesian(ylim = c(770, 865)) +
+        
+       d %>%
+          ggplot(aes(mois, debit)) +  geom_bar(stat = "identity") + coord_cartesian(ylim = c(770, 865)) +
           ggtitle("Moyenne du débit par annee") +
           xlab("annee")
         
       })
+      
     }
     
     else if (input$choix == "par jour") {
+      
+      
+      d <-  tibble(jour = DEBITJOUR$jour, debit = DEBITJOUR$debit) %>%
+        group_by(jour) %>%
+        summarise(debit = mean(debit))
+      
       output$debitmoyen <- renderPlot({
         jour = c("dimanche",
                  "lundi",
@@ -368,18 +381,23 @@ shinyServer(function(input, output, session) {
                  "vendredi",
                  "samedi")
         
-        tibble(mois = DEBITJOUR$jour, taux = DEBITJOUR$debit) %>%
-          group_by(mois) %>%
-          summarise(taux = mean(taux)) %>%
-          ggplot(aes(mois, taux)) + xlab("jour de la semaine") + coord_cartesian(ylim = c(600, 1000)) +
+          d %>%
+          ggplot(aes(jour, debit)) + xlab("jour de la semaine") + coord_cartesian(ylim = c(600, 1000)) +
           ggtitle("Moyenne du débit par jours") +
           geom_bar(stat = "identity") +
           scale_x_continuous(breaks = 1:7)
         
       })
+      
+      
     }
     
     else if (input$choix == "par mois") {
+      
+      d <- tibble(mois = DEBITMOY$mois, debit = DEBITMOY$debit) %>%
+        group_by(mois) %>%
+        summarise(debit = mean(debit))
+      
       output$debitmoyen <- renderPlot({
         month = c(
           "Janvier",
@@ -396,10 +414,8 @@ shinyServer(function(input, output, session) {
           "Decembre"
         )
         
-        tibble(mois = DEBITMOY$mois, taux = DEBITMOY$debit) %>%
-          group_by(mois) %>%
-          summarise(taux = mean(taux)) %>%
-          ggplot(aes(mois, taux)) + coord_cartesian(ylim = c(600, 900)) +
+        d %>%
+          ggplot(aes(mois, debit)) + coord_cartesian(ylim = c(600, 900)) +
           ggtitle("Moyenne du débit par jours") +
           geom_bar(stat = "identity") +
           scale_x_continuous(breaks = 1:12)
@@ -408,17 +424,26 @@ shinyServer(function(input, output, session) {
     }
     
     else if (input$choix == "par heure") {
+      
+      d <- tibble(heure = DEBITHEURE$heure, debit = DEBITHEURE$debit) %>%
+        group_by(heure) %>%
+        summarise(debit = mean(debit))
+      
       output$debitmoyen <- renderPlot({
-        tibble(mois = DEBITHEURE$heure, taux = DEBITHEURE$debit) %>%
-          group_by(mois) %>%
-          summarise(taux = mean(taux)) %>%
-          ggplot(aes(mois, taux)) + xlab("heure de la journée") +
+        d %>%
+          ggplot(aes(heure, debit)) + xlab("heure de la journée") +
           ggtitle("Moyenne du débit par heure") +
           geom_bar(stat = "identity") +
           scale_x_continuous(breaks = 0:23)
         
       })
     }
+    
+    output$minitable <- renderDataTable({
+      print(d)
+      as.data.frame(d)
+    })
+    
     
   })
   

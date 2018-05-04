@@ -100,7 +100,8 @@ ui <- fluidPage(
                                "par jour",
                                "par heure"),
                    selected = "par annee"
-                 )
+                 ),
+                 dataTableOutput("minitable")
                ),
                mainPanel(plotOutput(outputId = "debitmoyen", width = "100%"))
              )),
