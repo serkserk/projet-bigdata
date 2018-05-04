@@ -539,7 +539,7 @@ shinyServer(function(input, output, session) {
     detail = "veuillez attendre",
     value = 0.1,
     {
-      plot(ts(as.data.frame(clust2@centroids)), main="Profil des classes")
+      plot(ts(as.data.frame(clust2@centroids)), main="Profil des classes", plot.type='single', col=c("red", "blue"))
       incProgress(1)
     }
   ))
