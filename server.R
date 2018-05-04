@@ -9,6 +9,7 @@ library(ggplot2)
 library(leaflet.extras)
 library(fpp)
 library(forecast)
+library(dtwclust)
 
 ################### CONNECTION TO MONGO #######################
 
@@ -19,6 +20,11 @@ cap = mongo(collection = "capteurs",
 tra = mongo(collection = "trafic",
             db = "trafic",
             url = "mongodb://193.51.82.104:2343")
+
+
+load("data.RData")
+if(exists("clust2"))
+  print("Exist")
 
 
 ################## USEFUL FUNCTION ###################
@@ -501,8 +507,6 @@ shinyServer(function(input, output, session) {
                  detail = "veuillez attendre",
                  value = 0.1,
                  {
-                   load("data.RData")
-                   
                    paris = leaflet() %>% addTiles %>%
                      setView(lng = 2.34,
                              lat = 48.855,
