@@ -16,7 +16,7 @@ ui <- fluidPage(
     "Trafic Paris",
     
     tabPanel(
-      "Acceuil",
+      "Accueil",
       
       navlistPanel(
         tabPanel("Le projet",
@@ -92,16 +92,16 @@ ui <- fluidPage(
                sidebarPanel(
                  #selectInput(inputId = "choix",
                  #label = strong("Moyenne du débit : "),
-                 #            choices = c("par annee" , "par mois", "par jour","par heure"))
+                 #            choices = c("par années" , "par mois", "par jours","par heures"))
                  #),
                  radioButtons(
                    "choix",
                    label = "Moyenne du débit:",
-                   choices = c("par annee",
+                   choices = c("par années",
                                "par mois",
-                               "par jour",
-                               "par heure"),
-                   selected = "par annee"
+                               "par jours",
+                               "par heures"),
+                   selected = "par années"
                  ),
                  dataTableOutput("minitable")
                ),
@@ -124,7 +124,7 @@ ui <- fluidPage(
         dataTableOutput(outputId = "tabTop2"),
         splitLayout(
           plotOutput(outputId = "clustplot1"),
-          plotOutput(outputId = "clustplot2")
+          plotOutput(outputId = "clustplot2", width = "99%")
         ),
         width = "100%"
       )

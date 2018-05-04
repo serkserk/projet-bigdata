@@ -379,7 +379,7 @@ shinyServer(function(input, output, session) {
   ################ ONGLET 2 ###########
   
   observeEvent(input$choix, {
-    if (input$choix == "par annee") {
+    if (input$choix == "par années") {
       d <- tibble(mois = DEBITMOY$annee, debit = DEBITMOY$debit) %>%
         group_by(mois) %>%
         summarise(debit = mean(debit))
@@ -395,7 +395,7 @@ shinyServer(function(input, output, session) {
       })
     }
     
-    else if (input$choix == "par jour") {
+    else if (input$choix == "par jours") {
       d <-  tibble(jour = DEBITJOUR$jour, debit = DEBITJOUR$debit) %>%
         group_by(jour) %>%
         summarise(debit = mean(debit))
@@ -450,7 +450,7 @@ shinyServer(function(input, output, session) {
       })
     }
     
-    else if (input$choix == "par heure") {
+    else if (input$choix == "par heures") {
       d <- tibble(heure = DEBITHEURE$heure, debit = DEBITHEURE$debit) %>%
         group_by(heure) %>%
         summarise(debit = mean(debit))
