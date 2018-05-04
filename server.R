@@ -213,7 +213,6 @@ DEBITMOY <- read.csv("DEBITMOY.csv", row.names = 1)
 DEBITJOUR <- read.csv("debitjour.csv", row.names = 1)
 DEBITHEURE <- read.csv("DEBITHEURE.csv", row.names = 1)
 
-################### SERVER ##################
 
 shinyServer(function(input, output, session) {
   ######### VARIABLES SERVER  #######
@@ -253,8 +252,22 @@ shinyServer(function(input, output, session) {
     )
     
   })
-  
+
   ############ INPUT / OUTPUT ############
+  
+  ################### SERVER ##################
+  
+  introduction <- 'Projet de Big Data :
+
+-	Enseignant : Francois Xavier Jollois
+-	Killian Guiheux, Corentin Guillo, Serkan Azap
+
+Ce projet est réalisé dans le cadre de l’UE Big Data. Il consiste en la conception d’une application web en R et shiny, sur les données de trafic de la ville de Paris présent dans une base de données MongoDB.
+Dans cette application R shiny, nous avons développé un outil de classification des stations selon leurs profils d’utilisation durant la journée. Nous avons également réalisé un outil de prédiction du débit mensuelle sur l’année 2018, automatisé pour chaque station sélectionnée par l’utilisateur. Divers filtres sur la carte des stations sont mis à disposition et plusieurs graphiques permettront d’explorer le profil de chaque station. Enfin Un onglet permet d’avoir une vue globale du trafic de la ville de Paris.'
+  
+  output$introduction <- renderText({
+    introduction
+  })
   
   ############ ONGLET 1 CARTE CAPTEURS ##########
 

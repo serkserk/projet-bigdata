@@ -9,8 +9,7 @@ library(shinydashboard)
 library(jsonlite)
 
 
-ui <- fluidPage(
-    shinythemes::shinytheme("flatly"),
+ui <- fluidPage(shinytheme("flatly"),
   
   navbarPage(
     "Trafic Paris",
@@ -19,7 +18,8 @@ ui <- fluidPage(
       "Acceuil",
       
       navlistPanel(
-        tabPanel("Le projet"),
+        tabPanel("Le projet",
+                 verbatimTextOutput("introduction")),
         tabPanel(
           "Les données ",
           
