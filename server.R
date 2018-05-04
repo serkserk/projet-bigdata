@@ -258,8 +258,7 @@ shinyServer(function(input, output, session) {
           
           summarise(moy_taux = mean(tauxNum, na.rm = TRUE)) %>%
           ggplot(aes(mois, moy_taux, col = annee, group = annee)) +
-          geom_line() +
-          theme_classic()
+          geom_line() 
       })
       
       output$mois <- renderPlot({
@@ -268,8 +267,7 @@ shinyServer(function(input, output, session) {
           group_by(heure, mois) %>%
           summarise(moy = mean(tauxNum, na.rm = TRUE)) %>%
           ggplot(aes(heure, moy, col = mois, group = mois)) +
-          geom_line() +
-          theme_classic()
+          geom_line()
       })
       
       output$jour <- renderPlot({
@@ -357,8 +355,8 @@ shinyServer(function(input, output, session) {
         
         
        d %>%
-          ggplot(aes(mois, debit)) +  geom_bar(stat = "identity") + coord_cartesian(ylim = c(770, 865)) +
-          ggtitle("Moyenne du débit par annee") +
+          ggplot(aes(mois, debit)) +  geom_bar(stat = "identity",fill = "darkblue") + coord_cartesian(ylim = c(770, 865)) +
+          ggtitle("Moyenne du débit par annee") +  theme_classic() +
           xlab("annee")
         
       })
@@ -384,7 +382,7 @@ shinyServer(function(input, output, session) {
           d %>%
           ggplot(aes(jour, debit)) + xlab("jour de la semaine") + coord_cartesian(ylim = c(600, 1000)) +
           ggtitle("Moyenne du débit par jours") +
-          geom_bar(stat = "identity") +
+          geom_bar(stat = "identity",fill = "darkblue") +
           scale_x_continuous(breaks = 1:7)
         
       })
@@ -417,7 +415,7 @@ shinyServer(function(input, output, session) {
         d %>%
           ggplot(aes(mois, debit)) + coord_cartesian(ylim = c(600, 900)) +
           ggtitle("Moyenne du débit par jours") +
-          geom_bar(stat = "identity") +
+          geom_bar(stat = "identity",fill = "darkblue") +
           scale_x_continuous(breaks = 1:12)
         
       })
@@ -433,7 +431,7 @@ shinyServer(function(input, output, session) {
         d %>%
           ggplot(aes(heure, debit)) + xlab("heure de la journée") +
           ggtitle("Moyenne du débit par heure") +
-          geom_bar(stat = "identity") +
+          geom_bar(stat = "identity",fill = "darkblue") +
           scale_x_continuous(breaks = 0:23)
         
       })

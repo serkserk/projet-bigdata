@@ -10,7 +10,7 @@ library(jsonlite)
 
 
 ui <- fluidPage(
-  shinythemes::themeSelector(),
+    shinythemes::shinytheme("flatly"),
   
   navbarPage(
     "Trafic Paris",
@@ -103,7 +103,7 @@ ui <- fluidPage(
                  ),
                  dataTableOutput("minitable")
                ),
-               mainPanel(plotOutput(outputId = "debitmoyen", width = "100%"))
+               mainPanel(plotOutput(outputId = "debitmoyen", width = "100%",height = "600px"))
              )),
     
     
