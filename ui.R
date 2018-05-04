@@ -9,7 +9,8 @@ library(shinydashboard)
 library(jsonlite)
 
 
-ui <- fluidPage(shinytheme("flatly"),
+ui <- fluidPage(
+  theme = shinytheme("flatly"),
   
   navbarPage(
     "Trafic Paris",
@@ -40,7 +41,7 @@ ui <- fluidPage(shinytheme("flatly"),
         "-----",
         tabPanel("L'équipe",
                  
-                 mainPanel(textOutput("text3")))
+                 verbatimTextOutput("equipe"))
       )
     ),
     
@@ -104,7 +105,13 @@ ui <- fluidPage(shinytheme("flatly"),
                  ),
                  dataTableOutput("minitable")
                ),
-               mainPanel(plotOutput(outputId = "debitmoyen", width = "100%",height = "600px"))
+               mainPanel(
+                 plotOutput(
+                   outputId = "debitmoyen",
+                   width = "100%",
+                   height = "600px"
+                 )
+               )
              )),
     
     

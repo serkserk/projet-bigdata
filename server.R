@@ -186,7 +186,7 @@ PredictDebit <- function(number) {
   colnames(trafic_agg) <- c('annee', 'mois', 'taux')
   
   trafic_agg <-
-    trafic_agg[order(trafic_agg$annee, trafic_agg$mois), ]
+    trafic_agg[order(trafic_agg$annee, trafic_agg$mois),]
   
   z <- ts(trafic_agg$taux,
           frequency = 12,
@@ -232,11 +232,10 @@ shinyServer(function(input, output, session) {
   
   # Carte de paris
   output$Carte_capteurs <- renderLeaflet({
-    
     # TABLE DES DONNEES TRIER
     merged <- merge(geo, TRAFFIC_ANNEE)
-    ord <- merged[order(merged$taux), ]
-    ord <- ord[which(ord$taux > 0), ]
+    ord <- merged[order(merged$taux),]
+    ord <- ord[which(ord$taux > 0),]
     top <- ord
     popup <- paste0("<strong> Station Id :  </strong>", top$id)
     paris %>% addCircleMarkers(
@@ -252,25 +251,36 @@ shinyServer(function(input, output, session) {
     )
     
   })
-
+  
   ############ INPUT / OUTPUT ############
   
   ################### SERVER ##################
   
   introduction <- 'Projet de Big Data :
-
--	Enseignant : Francois Xavier Jollois
--	Killian Guiheux, Corentin Guillo, Serkan Azap
-
-Ce projet est réalisé dans le cadre de l’UE Big Data. Il consiste en la conception d’une application web en R et shiny, sur les données de trafic de la ville de Paris présent dans une base de données MongoDB.
-Dans cette application R shiny, nous avons développé un outil de classification des stations selon leurs profils d’utilisation durant la journée. Nous avons également réalisé un outil de prédiction du débit mensuelle sur l’année 2018, automatisé pour chaque station sélectionnée par l’utilisateur. Divers filtres sur la carte des stations sont mis à disposition et plusieurs graphiques permettront d’explorer le profil de chaque station. Enfin Un onglet permet d’avoir une vue globale du trafic de la ville de Paris.'
+  
+  Ce projet est réalisé dans le cadre de l’UE Big Data. Il consiste en la conception d’une application web en R et shiny,
+  sur les données de trafic de la ville de Paris présent dans une base de données MongoDB.
+  Dans cette application R shiny, nous avons développé un outil de classification des stations selon leurs profils d’utilisation durant la journée.
+  Nous avons également réalisé un outil de prédiction du débit mensuelle sur l’année 2018,
+  automatisé pour chaque station sélectionnée par l’utilisateur.
+  Divers filtres sur la carte des stations sont mis à disposition et plusieurs graphiques permettront d’explorer le profil de chaque station.
+  Enfin Un onglet permet d’avoir une vue globale du trafic de la ville de Paris.'
   
   output$introduction <- renderText({
     introduction
   })
   
+  equipe = "
+  -	Enseignant : Francois Xavier Jollois
+  -	AZAP Serkan, GUIHEUX Killian, GUILLO Corentin Guillo
+  "
+  
+  output$equipe <- renderText({
+    equipe
+  })
+  
   ############ ONGLET 1 CARTE CAPTEURS ##########
-
+  
   # Event when a stationis clicked
   observeEvent(input$Carte_capteurs_marker_click, {
     click <- input$Carte_capteurs_marker_click
@@ -289,7 +299,7 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
           
           summarise(moy_taux = mean(tauxNum, na.rm = TRUE)) %>%
           ggplot(aes(mois, moy_taux, col = annee, group = annee)) +
-          geom_line() 
+          geom_line()
       })
       
       output$mois <- renderPlot({
@@ -318,7 +328,7 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
       })
     }
   })
-
+  
   
   observeEvent(input$top, {
     # Connection a la carte
@@ -328,8 +338,8 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
     
     # TABLE DES DONNEES TRIER
     merged <- merge(geo, TRAFFIC_ANNEE)
-    ord <- merged[order(merged$taux), ]
-    ord <- ord[which(ord$taux > 0), ]
+    ord <- merged[order(merged$taux),]
+    ord <- ord[which(ord$taux > 0),]
     
     proxy %>% clearMarkers()
     
@@ -339,12 +349,12 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
     }
     else if (input$top == "Station avec le plus de traffic") {
       print("test")
-      top <- ord[(nrow(ord) - 49):(nrow(ord)), ]
+      top <- ord[(nrow(ord) - 49):(nrow(ord)),]
       print(nrow(ord))
       
     }
     else if (input$top == "Station avec le moins de traffic") {
-      top <- ord[1:50, ]
+      top <- ord[1:50,]
     }
     
     popup <- paste0("<strong> Station Id :  </strong>", top$id)
@@ -375,18 +385,16 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
   ################ ONGLET 2 ###########
   
   observeEvent(input$choix, {
-    
     if (input$choix == "par annee") {
-      
       d <- tibble(mois = DEBITMOY$annee, debit = DEBITMOY$debit) %>%
         group_by(mois) %>%
         summarise(debit = mean(debit))
       
       output$debitmoyen <- renderPlot({
         annee = c("2013", "2014", "2015", "2016")
-
-       d %>%
-          ggplot(aes(mois, debit)) +  geom_bar(stat = "identity",fill = "darkblue") + coord_cartesian(ylim = c(770, 865)) +
+        
+        d %>%
+          ggplot(aes(mois, debit)) +  geom_bar(stat = "identity", fill = "darkblue") + coord_cartesian(ylim = c(770, 865)) +
           ggtitle("Moyenne du débit par annee") +  theme_classic() +
           xlab("annee")
         
@@ -394,8 +402,6 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
     }
     
     else if (input$choix == "par jour") {
-      
-      
       d <-  tibble(jour = DEBITJOUR$jour, debit = DEBITJOUR$debit) %>%
         group_by(jour) %>%
         summarise(debit = mean(debit))
@@ -409,10 +415,10 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
                  "vendredi",
                  "samedi")
         
-          d %>%
+        d %>%
           ggplot(aes(jour, debit)) + xlab("jour de la semaine") + coord_cartesian(ylim = c(600, 1000)) +
           ggtitle("Moyenne du débit par jours") +
-          geom_bar(stat = "identity",fill = "darkblue") +
+          geom_bar(stat = "identity", fill = "darkblue") +
           scale_x_continuous(breaks = 1:7)
         
       })
@@ -421,7 +427,6 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
     }
     
     else if (input$choix == "par mois") {
-      
       d <- tibble(mois = DEBITMOY$mois, debit = DEBITMOY$debit) %>%
         group_by(mois) %>%
         summarise(debit = mean(debit))
@@ -445,14 +450,13 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
         d %>%
           ggplot(aes(mois, debit)) + coord_cartesian(ylim = c(600, 900)) +
           ggtitle("Moyenne du débit par jours") +
-          geom_bar(stat = "identity",fill = "darkblue") +
+          geom_bar(stat = "identity", fill = "darkblue") +
           scale_x_continuous(breaks = 1:12)
         
       })
     }
     
     else if (input$choix == "par heure") {
-      
       d <- tibble(heure = DEBITHEURE$heure, debit = DEBITHEURE$debit) %>%
         group_by(heure) %>%
         summarise(debit = mean(debit))
@@ -461,7 +465,7 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
         d %>%
           ggplot(aes(heure, debit)) + xlab("heure de la journée") +
           ggtitle("Moyenne du débit par heure") +
-          geom_bar(stat = "identity",fill = "darkblue") +
+          geom_bar(stat = "identity", fill = "darkblue") +
           scale_x_continuous(breaks = 0:23)
         
       })
@@ -476,7 +480,6 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
   })
   
   ###### ONGLET ACCEUIL ######
-  
   
   output$acc1 <-
     renderText({
@@ -503,5 +506,34 @@ Dans cette application R shiny, nous avons développé un outil de classificatio
              icon =  icon("list"),
              color = "yellow")
   })
+  
+  
+  # Carte de paris
+  output$Clust_capteurs <- renderLeaflet({
+    load("data.RData")
+    
+    
+    
+    paris = leaflet() %>% addTiles %>%
+      setView(lng = 2.34,
+              lat = 48.855,
+              zoom = 12) %>%
+      addProviderTiles(providers$Stamen.TonerLite)
+    
+    paris %>%
+      addCircleMarkers(
+        data = merged,
+        lng = ~ lng,
+        lat = ~ lat,
+        weight = 1,
+        radius = 20 * merged[, 12] / max(merged[, 12]),
+        fillOpacity = 1,
+        fillColor = pal(clust2@cluster)
+      )
+    
+    
+  })
+  
+  
   
 })
