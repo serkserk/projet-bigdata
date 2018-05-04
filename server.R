@@ -344,7 +344,7 @@ shinyServer(function(input, output, session) {
     else if (input$top == "Station avec le moins de traffic") {
       top <- ord[1:50, ]
     }
-    
+    top = ord
     popup <- paste0("<strong> Station Id :  </strong>", top$id)
     proxy %>% addCircleMarkers(
       data = top,
@@ -494,9 +494,7 @@ shinyServer(function(input, output, session) {
              icon =  icon("list"),
              color = "yellow")
   })
-  
-  
-  
+
   # Carte de paris
   output$Clust_capteurs <- renderLeaflet({
     withProgress(message = "chargement...",
@@ -510,8 +508,7 @@ shinyServer(function(input, output, session) {
                              lat = 48.855,
                              zoom = 12) %>%
                      addProviderTiles(providers$Stamen.TonerLite)
-                   
-                   
+
                    paris %>%
                      addCircleMarkers(
                        data = merged,
@@ -547,7 +544,7 @@ shinyServer(function(input, output, session) {
       incProgress(1)
     }
   ))
-  
+
   output$clustplot3 <- renderPlot(withProgress(
     message = "chargement...",
     detail = "veuillez attendre",
@@ -574,8 +571,8 @@ shinyServer(function(input, output, session) {
   })
   
   equipe = "
-  -	Enseignant : Francois Xavier Jollois
-  -	AZAP Serkan - AZAP-serkan@hotmail.fr
+- Enseignant : Francois Xavier Jollois
+- AZAP Serkan - AZAP-serkan@hotmail.fr
   GUIHEUX Killian - killian.guiheux@gmail.com
   GUILLO Corentin Guillo - corentin_guillo@hotmail.fr
   "
