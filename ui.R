@@ -123,10 +123,10 @@ ui <- fluidPage(
         leafletOutput("Clust_capteurs"),
         dataTableOutput(outputId = "tabTop2"),
         splitLayout(
-          plotOutput(outputId = "clustplot3"),
-          plotOutput(outputId = "clustplot2"),
-          plotOutput(outputId = "clustplot1")
-        )
+          plotOutput(outputId = "clustplot1"),
+          plotOutput(outputId = "clustplot2")
+        ),
+        width = "100%"
       )
     )
   )

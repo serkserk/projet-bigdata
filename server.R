@@ -23,7 +23,7 @@ tra = mongo(collection = "trafic",
 
 
 load("data.RData")
-if(exists("clust2"))
+if (exists("clust2"))
   print("Exist")
 
 
@@ -192,7 +192,7 @@ PredictDebit <- function(number) {
   colnames(trafic_agg) <- c('annee', 'mois', 'taux')
   
   trafic_agg <-
-    trafic_agg[order(trafic_agg$annee, trafic_agg$mois), ]
+    trafic_agg[order(trafic_agg$annee, trafic_agg$mois),]
   
   z <- ts(trafic_agg$taux,
           frequency = 12,
@@ -240,8 +240,8 @@ shinyServer(function(input, output, session) {
   output$Carte_capteurs <- renderLeaflet({
     # TABLE DES DONNEES TRIER
     merged <- merge(geo, TRAFFIC_ANNEE)
-    ord <- merged[order(merged$taux), ]
-    ord <- ord[which(ord$taux > 0), ]
+    ord <- merged[order(merged$taux),]
+    ord <- ord[which(ord$taux > 0),]
     top <- ord
     popup <- paste0("<strong> Station Id :  </strong>", top$id)
     paris %>% addCircleMarkers(
@@ -332,8 +332,8 @@ shinyServer(function(input, output, session) {
     
     # TABLE DES DONNEES TRIER
     merged <- merge(geo, TRAFFIC_ANNEE)
-    ord <- merged[order(merged$taux), ]
-    ord <- ord[which(ord$taux > 0), ]
+    ord <- merged[order(merged$taux),]
+    ord <- ord[which(ord$taux > 0),]
     
     proxy %>% clearMarkers()
     
@@ -343,12 +343,12 @@ shinyServer(function(input, output, session) {
     }
     else if (input$top == "Station avec le plus de traffic") {
       print("test")
-      top <- ord[(nrow(ord) - 49):(nrow(ord)), ]
+      top <- ord[(nrow(ord) - 49):(nrow(ord)),]
       print(nrow(ord))
       
     }
     else if (input$top == "Station avec le moins de traffic") {
-      top <- ord[1:50, ]
+      top <- ord[1:50,]
     }
     top = ord
     popup <- paste0("<strong> Station Id :  </strong>", top$id)
@@ -500,33 +500,27 @@ shinyServer(function(input, output, session) {
              icon =  icon("list"),
              color = "yellow")
   })
-
+  
   # Carte de paris
   output$Clust_capteurs <- renderLeaflet({
-    withProgress(message = "chargement...",
-                 detail = "veuillez attendre",
-                 value = 0.1,
-                 {
-                   paris = leaflet() %>% addTiles %>%
-                     setView(lng = 2.34,
-                             lat = 48.855,
-                             zoom = 12) %>%
-                     addProviderTiles(providers$Stamen.TonerLite)
-
-                   paris %>%
-                     addCircleMarkers(
-                       data = merged,
-                       lng = ~ lng,
-                       lat = ~ lat,
-                       weight = 1,
-                       radius = 20 * merged[, 12] / max(merged[, 12]),
-                       fillOpacity = 1,
-                       fillColor = pal(clust2@cluster)
-                     )
-                   
-                   incProgress(1)
-                 })
+    paris = leaflet() %>% addTiles %>%
+      setView(lng = 2.34,
+              lat = 48.855,
+              zoom = 12) %>%
+      addProviderTiles(providers$Stamen.TonerLite)
+    
+    paris %>%
+      addCircleMarkers(
+        data = merged,
+        lng = ~ lng,
+        lat = ~ lat,
+        weight = 1,
+        radius = 20 * merged[, 12] / max(merged[, 12]),
+        fillOpacity = 1,
+        fillColor = pal(clust2@cluster)
+      )
   })
+  
   
   
   output$clustplot1 <- renderPlot(withProgress(
@@ -534,10 +528,11 @@ shinyServer(function(input, output, session) {
     detail = "veuillez attendre",
     value = 0.1,
     {
-      plot(clust2)
+      plot(clust2, type = "sc")
       incProgress(1)
     }
   ))
+  
   
   output$clustplot2 <- renderPlot(withProgress(
     message = "chargement...",
@@ -548,16 +543,7 @@ shinyServer(function(input, output, session) {
       incProgress(1)
     }
   ))
-
-  output$clustplot3 <- renderPlot(withProgress(
-    message = "chargement...",
-    detail = "veuillez attendre",
-    value = 0.1,
-    {
-      plot(clust2, type = "sc")
-      incProgress(1)
-    }
-  ))
+  
   
   
   introduction <- 'Projet de Big Data :
@@ -575,8 +561,8 @@ shinyServer(function(input, output, session) {
   })
   
   equipe = "
-- Enseignant : Francois Xavier Jollois
-- AZAP Serkan - AZAP-serkan@hotmail.fr
+  - Enseignant : Francois Xavier Jollois
+  - AZAP Serkan - AZAP-serkan@hotmail.fr
   GUIHEUX Killian - killian.guiheux@gmail.com
   GUILLO Corentin Guillo - corentin_guillo@hotmail.fr
   "
