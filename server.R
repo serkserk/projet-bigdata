@@ -233,13 +233,31 @@ shinyServer(function(input, output, session) {
   
   # Carte de paris
   output$Carte_capteurs <- renderLeaflet({
-    paris
+    
+    # TABLE DES DONNEES TRIER
+    merged <- merge(geo, TRAFFIC_ANNEE)
+    ord <- merged[order(merged$taux), ]
+    ord <- ord[which(ord$taux > 0), ]
+    top <- ord
+    popup <- paste0("<strong> Station Id :  </strong>", top$id)
+    paris %>% addCircleMarkers(
+      data = top,
+      lat = ~ lat,
+      lng = ~ lng,
+      radius = 1,
+      opacity = 0.5,
+      layerId = ~ id,
+      popup = popup,
+      weight = 5,
+      color = "blue"
+    )
+    
   })
   
   ############ INPUT / OUTPUT ############
   
   ############ ONGLET 1 CARTE CAPTEURS ##########
-  
+
   # Event when a stationis clicked
   observeEvent(input$Carte_capteurs_marker_click, {
     click <- input$Carte_capteurs_marker_click
@@ -287,6 +305,7 @@ shinyServer(function(input, output, session) {
       })
     }
   })
+
   
   observeEvent(input$top, {
     # Connection a la carte
@@ -301,7 +320,11 @@ shinyServer(function(input, output, session) {
     
     proxy %>% clearMarkers()
     
-    if (input$top == "Station avec le plus de traffic") {
+    if (input$top == "toute les stations") {
+      top <- ord
+      
+    }
+    else if (input$top == "Station avec le plus de traffic") {
       print("test")
       top <- ord[(nrow(ord) - 49):(nrow(ord)), ]
       print(nrow(ord))
@@ -309,9 +332,6 @@ shinyServer(function(input, output, session) {
     }
     else if (input$top == "Station avec le moins de traffic") {
       top <- ord[1:50, ]
-    }
-    else{
-      top <- ord
     }
     
     popup <- paste0("<strong> Station Id :  </strong>", top$id)
@@ -349,18 +369,15 @@ shinyServer(function(input, output, session) {
         group_by(mois) %>%
         summarise(debit = mean(debit))
       
-      
       output$debitmoyen <- renderPlot({
         annee = c("2013", "2014", "2015", "2016")
-        
-        
+
        d %>%
           ggplot(aes(mois, debit)) +  geom_bar(stat = "identity",fill = "darkblue") + coord_cartesian(ylim = c(770, 865)) +
           ggtitle("Moyenne du débit par annee") +  theme_classic() +
           xlab("annee")
         
       })
-      
     }
     
     else if (input$choix == "par jour") {

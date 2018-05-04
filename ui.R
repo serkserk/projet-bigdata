@@ -56,7 +56,8 @@ ui <- fluidPage(
                      "Station avec le plus de traffic",
                      "Station avec le moins de traffic",
                      "heatmap traffic"
-                   )
+                   ),
+                   selected =  "toute les stations"
                  ),
                  plotOutput(outputId = "prediction"),
                  plotOutput(
